@@ -40,7 +40,25 @@ MEMBERS = load_members()
 
 
 def normalize_phone(value: str) -> str:
-    return re.sub(r"\D+", "", (value or "").strip())
+    digits = re.sub(r"\D+", "", (value or "").strip())
+    if not digits:
+        return ""
+    if digits.endswith(".0"):
+        digits = digits[:-2]
+    return digits
+
+
+def phone_variants(value: str) -> set[str]:
+    digits = normalize_phone(value)
+    variants = set()
+    if not digits:
+        return variants
+    variants.add(digits)
+    if digits.startswith("0"):
+        variants.add(digits[1:])
+    else:
+        variants.add("0" + digits)
+    return {v for v in variants if v}
 
 
 def canonicalize_name(value: str) -> str:
@@ -76,6 +94,13 @@ def format_generation(generation: str) -> str:
     return g if g.endswith("세") else f"{g}세"
 
 
+def clean_postcode(value: str) -> str:
+    s = str(value or "").strip()
+    if s.endswith(".0"):
+        s = s[:-2]
+    return s
+
+
 def rate_limit_ok(ip: str) -> bool:
     now = time.time()
     q = _recent_requests[ip]
@@ -97,13 +122,13 @@ def request_ip() -> str:
 
 def find_member(input_name: str, input_phone: str):
     input_name = canonicalize_name(input_name)
-    input_phone = normalize_phone(input_phone)
-    if not input_name or not input_phone:
+    input_phone_variants = phone_variants(input_phone)
+    if not input_name or not input_phone_variants:
         return None
 
     for member in MEMBERS:
-        member_phone = normalize_phone(member.get("phone", ""))
-        if member_phone != input_phone:
+        member_phone_variants = phone_variants(member.get("phone", ""))
+        if not (member_phone_variants & input_phone_variants):
             continue
         variants = split_name_variants(member.get("name", ""))
         if input_name in variants:
@@ -210,7 +235,7 @@ def api_check_member():
         "input_phone": normalize_phone(input_phone),
         "member_name": member.get("name", ""),
         "generation": generation_display,
-        "zipcode": existing_address.get("zipcode") or member.get("zipcode", "") or "",
+        "zipcode": clean_postcode(existing_address.get("zipcode") or member.get("zipcode", "") or ""),
         "address": existing_address.get("address") or member.get("address", "") or "",
         "detail_address": existing_address.get("detail_address") or member.get("detail_address", "") or "",
     }
