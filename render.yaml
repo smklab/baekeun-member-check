@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: baekeun-member-check
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: ADMIN_CONTACT
+        value: 010-2923-2912 신무광
+      - key: REQUEST_WINDOW_SECONDS
+        value: 300
+      - key: MAX_REQUESTS_PER_WINDOW
+        value: 20
