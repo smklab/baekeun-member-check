@@ -1,58 +1,397 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ title }}</title>
   <style>
-    body{margin:0;padding:24px;background:#eef2f7;color:#162033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;}
-    .wrap{max-width:1400px;margin:0 auto;}
-    .top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
-    h1{margin:0;font-size:34px;}
-    .sub{margin:6px 0 0;color:#6b7890;}
-    .tools{display:flex;gap:10px;flex-wrap:wrap;}
-    input[type="search"], input[type="text"]{padding:12px 14px;border:1px solid #cfd8e6;border-radius:12px;font-size:15px;}
-    button{padding:12px 16px;border:none;border-radius:12px;background:#2d559a;color:#fff;font-weight:700;cursor:pointer;}
-    button.secondary{background:#475467;}
-    .panel{background:#fff;border:1px solid #dbe4f0;border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(18,28,45,.05);}
-    .notice{margin-bottom:14px;color:#6b7890;font-size:14px;}
-    table{width:100%;border-collapse:collapse;font-size:14px;}
-    th,td{padding:12px 10px;border-bottom:1px solid #e8eef7;text-align:left;vertical-align:top;}
-    th{background:#f8fafc;position:sticky;top:0;}
-    .table-wrap{overflow:auto;max-height:70vh;border-radius:14px;border:1px solid #e8eef7;}
-    .action-btn{padding:8px 10px;font-size:13px;border-radius:10px;}
-    .status{margin:12px 0 0;font-size:14px;color:#0f766e;}
-    .error{color:#b42318;}
-    dialog{border:none;border-radius:18px;padding:0;max-width:640px;width:95%;}
-    dialog::backdrop{background:rgba(0,0,0,.35);}
-    .modal{padding:24px;}
-    .modal h2{margin:0 0 12px;}
-    .field{margin:12px 0;}
-    .field label{display:block;font-weight:700;margin-bottom:8px;}
-    .field input{width:100%;}
-    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
-    @media (max-width: 768px){body{padding:12px;} h1{font-size:28px;}}
+    :root {
+      --bg: #eef3f8;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #6b7a90;
+      --line: #d9e2ec;
+      --primary: #2f5aa8;
+      --primary-hover: #264a8a;
+      --secondary: #55657f;
+      --secondary-hover: #43526a;
+      --danger: #c0392b;
+      --ok-bg: #edf7ee;
+      --ok-text: #1f6b2d;
+      --err-bg: #fdeeee;
+      --err-text: #c0392b;
+      --shadow: 0 8px 24px rgba(20, 33, 61, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Noto Sans KR", "Malgun Gothic", "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1820px;
+      margin: 0 auto;
+      padding: 36px 28px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    .titlebox h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .titlebox p {
+      margin: 14px 0 0;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .search {
+      width: 280px;
+      max-width: 100%;
+      height: 54px;
+      border: 1px solid #c8d4e3;
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .search:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(47, 90, 168, 0.12);
+    }
+
+    .btn {
+      height: 54px;
+      border: none;
+      border-radius: 16px;
+      padding: 0 24px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+      color: #fff;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn.secondary {
+      background: var(--secondary);
+    }
+
+    .btn.secondary:hover {
+      background: var(--secondary-hover);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 24px 22px 18px;
+    }
+
+    .guide {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 1320px;
+    }
+
+    thead th {
+      background: #f7f9fc;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
+      padding: 16px 12px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    thead th:first-child {
+      border-left: 1px solid var(--line);
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+
+    thead th:last-child {
+      border-right: 1px solid var(--line);
+      border-top-right-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+
+    tbody td {
+      background: #fff;
+      padding: 14px 12px;
+      font-size: 15px;
+      text-align: center;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+
+    tbody tr:hover td {
+      background: #fbfdff;
+    }
+
+    .left {
+      text-align: left;
+    }
+
+    .status {
+      margin: 16px 4px 6px;
+      font-size: 15px;
+      min-height: 24px;
+      color: var(--muted);
+    }
+
+    .status.error {
+      color: var(--err-text);
+      font-weight: 700;
+    }
+
+    .status.ok {
+      color: var(--ok-text);
+      font-weight: 700;
+    }
+
+    .mini-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 9px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      background: #1c8c83;
+      transition: 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .mini-btn:hover {
+      background: #16756f;
+    }
+
+    .empty {
+      padding: 24px 0 8px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 760px;
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.22);
+      padding: 26px 24px 22px;
+    }
+
+    .modal-card h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .modal-desc {
+      margin: 0 0 18px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #c8d4e3;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 16px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(47, 90, 168, 0.12);
+    }
+
+    .readonly {
+      background: #f7f9fc !important;
+      color: #5d6b82;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        flex-direction: column;
+      }
+
+      .actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .search {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 22px 14px 36px;
+      }
+
+      .titlebox h1 {
+        font-size: 28px;
+      }
+
+      .titlebox p {
+        font-size: 16px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+      }
+
+      .modal-card {
+        padding: 22px 16px 18px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="top">
-      <div>
+    <div class="topbar">
+      <div class="titlebox">
         <h1>{{ title }}</h1>
-        <p class="sub">Apps Script를 통해 저장된 종원 주소를 검색하고 수정할 수 있습니다.</p>
+        <p>Apps Script를 통해 저장된 종원 주소를 검색하고 수정할 수 있습니다.</p>
       </div>
-      <div class="tools">
-        <input id="searchInput" type="search" placeholder="이름, 연락처, 주소 검색">
-        <button id="searchBtn" type="button">검색</button>
-        <button id="reloadBtn" type="button" class="secondary">새로고침</button>
-        <button id="logoutBtn" type="button" class="secondary">로그아웃</button>
+
+      <div class="actions">
+        <input
+          id="searchInput"
+          class="search"
+          type="text"
+          placeholder="이름, 연락처, 주소 검색"
+        />
+        <button id="searchBtn" class="btn primary" type="button">검색</button>
+        <button id="refreshBtn" class="btn secondary" type="button">새로고침</button>
+        <button id="logoutBtn" class="btn secondary" type="button">로그아웃</button>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="notice">같은 종원이 다시 제출하면 기존 행이 갱신됩니다. 수정 버튼을 누르면 관리자도 직접 주소를 바꿀 수 있습니다.</div>
+    <div class="card">
+      <p class="guide">
+        같은 종원이 다시 제출하면 기존 행이 갱신됩니다. 수정 버튼을 누르면 관리자도 직접 주소를 바꿀 수 있습니다.
+      </p>
+
       <div class="table-wrap">
-        <table id="rowsTable">
+        <table>
           <thead>
             <tr>
               <th>행</th>
@@ -68,130 +407,273 @@
               <th>작업</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody id="tbody"></tbody>
         </table>
       </div>
-      <div id="status" class="status"></div>
+
+      <div id="statusEl" class="status"></div>
+      <div id="emptyEl" class="empty" style="display:none;">표시할 주소 정보가 없습니다.</div>
     </div>
   </div>
 
-  <dialog id="editDialog">
-    <div class="modal">
+  <div id="editModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-card">
       <h2>주소 수정</h2>
-      <div class="field">
-        <label>행 번호</label>
-        <input id="editRowNumber" type="text" readonly>
+      <p class="modal-desc">
+        종원이 제출한 주소 정보를 확인한 뒤 필요한 경우 수정할 수 있습니다.
+      </p>
+
+      <div class="grid">
+        <div class="field">
+          <label for="modalRowNumber">행 번호</label>
+          <input id="modalRowNumber" class="readonly" type="text" readonly />
+        </div>
+
+        <div class="field">
+          <label for="modalMemberName">명부성명</label>
+          <input id="modalMemberName" class="readonly" type="text" readonly />
+        </div>
+
+        <div class="field">
+          <label for="modalInputName">입력성명</label>
+          <input id="modalInputName" class="readonly" type="text" readonly />
+        </div>
+
+        <div class="field">
+          <label for="modalInputPhone">연락처</label>
+          <input id="modalInputPhone" class="readonly" type="text" readonly />
+        </div>
+
+        <div class="field">
+          <label for="modalZipcode">우편번호</label>
+          <input id="modalZipcode" type="text" />
+        </div>
+
+        <div class="field">
+          <label for="modalAddress">주소</label>
+          <input id="modalAddress" type="text" />
+        </div>
+
+        <div class="field">
+          <label for="modalDetailAddress">상세주소</label>
+          <textarea id="modalDetailAddress"></textarea>
+        </div>
       </div>
-      <div class="field">
-        <label>우편번호</label>
-        <input id="editZipcode" type="text">
-      </div>
-      <div class="field">
-        <label>주소</label>
-        <input id="editAddress" type="text">
-      </div>
-      <div class="field">
-        <label>상세주소</label>
-        <input id="editDetailAddress" type="text">
-      </div>
+
+      <div id="modalStatus" class="status"></div>
+
       <div class="modal-actions">
-        <button id="closeDialogBtn" type="button" class="secondary">취소</button>
-        <button id="saveDialogBtn" type="button">저장</button>
+        <button id="modalCancelBtn" class="btn secondary" type="button">취소</button>
+        <button id="modalSaveBtn" class="btn primary" type="button">저장</button>
       </div>
+
+      <p class="footer-note">
+        수정 내용은 Apps Script와 연결된 Google Sheets에 반영됩니다.
+      </p>
     </div>
-  </dialog>
+  </div>
 
   <script>
-    const tbody = document.querySelector('#rowsTable tbody');
-    const statusEl = document.getElementById('status');
-    const dialogEl = document.getElementById('editDialog');
     const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const tbody = document.getElementById('tbody');
+    const statusEl = document.getElementById('statusEl');
+    const emptyEl = document.getElementById('emptyEl');
 
-    function setStatus(message, isError=false) {
+    const editModal = document.getElementById('editModal');
+    const modalStatus = document.getElementById('modalStatus');
+    const modalRowNumber = document.getElementById('modalRowNumber');
+    const modalMemberName = document.getElementById('modalMemberName');
+    const modalInputName = document.getElementById('modalInputName');
+    const modalInputPhone = document.getElementById('modalInputPhone');
+    const modalZipcode = document.getElementById('modalZipcode');
+    const modalAddress = document.getElementById('modalAddress');
+    const modalDetailAddress = document.getElementById('modalDetailAddress');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+
+    let currentRows = [];
+    let editingRow = null;
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function setStatus(message, isError = false, isOk = false) {
       statusEl.textContent = message || '';
-      statusEl.className = 'status' + (isError ? ' error' : '');
+      statusEl.className = 'status' + (isError ? ' error' : isOk ? ' ok' : '');
+    }
+
+    function setModalStatus(message, isError = false, isOk = false) {
+      modalStatus.textContent = message || '';
+      modalStatus.className = 'status' + (isError ? ' error' : isOk ? ' ok' : '');
+    }
+
+    function openModal(row) {
+      editingRow = row;
+      modalRowNumber.value = row.row_number ?? '';
+      modalMemberName.value = row.member_name || '';
+      modalInputName.value = row.input_name || '';
+      modalInputPhone.value = row.input_phone || '';
+      modalZipcode.value = row.zipcode || '';
+      modalAddress.value = row.address || '';
+      modalDetailAddress.value = row.detail_address || '';
+      setModalStatus('');
+      editModal.classList.remove('hidden');
+      editModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeModal() {
+      editingRow = null;
+      editModal.classList.add('hidden');
+      editModal.setAttribute('aria-hidden', 'true');
+      setModalStatus('');
+    }
+
+    function renderRows(rows) {
+      tbody.innerHTML = '';
+      emptyEl.style.display = rows.length ? 'none' : 'block';
+
+      for (const row of rows) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(row.row_number ?? '')}</td>
+          <td>${escapeHtml(row.updated_at || row.submitted_at || '')}</td>
+          <td>${escapeHtml(row.input_name || '')}</td>
+          <td>${escapeHtml(row.input_phone || '')}</td>
+          <td>${escapeHtml(row.member_name || '')}</td>
+          <td>${escapeHtml(row.generation || '')}</td>
+          <td>${escapeHtml(row.zipcode || '')}</td>
+          <td class="left">${escapeHtml(row.address || '')}</td>
+          <td class="left">${escapeHtml(row.detail_address || '')}</td>
+          <td>${escapeHtml(row.consent || '')}</td>
+          <td>
+            <button type="button" class="mini-btn edit-btn" data-row="${escapeHtml(row.row_number ?? '')}">
+              수정
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.querySelectorAll('.edit-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const rowNumber = Number(btn.dataset.row);
+          const row = currentRows.find((item) => Number(item.row_number) === rowNumber);
+          if (row) openModal(row);
+        });
+      });
     }
 
     async function loadRows() {
       const q = searchInput.value.trim();
       setStatus('불러오는 중...');
+      emptyEl.style.display = 'none';
       tbody.innerHTML = '';
+
       try {
-        const res = await fetch('/api/admin/rows?' + new URLSearchParams({q}));
+        const res = await fetch('/api/admin/entries?' + new URLSearchParams({ q }));
         const data = await res.json();
+
         if (!res.ok || !data.ok) {
           setStatus(data.message || '데이터를 불러오지 못했습니다.', true);
           return;
         }
-        if (!data.rows.length) {
+
+        currentRows = Array.isArray(data.rows) ? data.rows : [];
+        renderRows(currentRows);
+
+        if (currentRows.length) {
+          setStatus(`총 ${currentRows.length}건을 불러왔습니다.`, false, true);
+        } else {
           setStatus('표시할 주소 정보가 없습니다.');
-          return;
         }
-        for (const row of data.rows) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${row._row_number}</td>
-            <td>${row['수정시각'] || row['제출시각'] || ''}</td>
-            <td>${row['입력성명'] || ''}</td>
-            <td>${row['입력연락처'] || ''}</td>
-            <td>${row['명부성명'] || ''}</td>
-            <td>${row['세대'] || ''}</td>
-            <td>${row['우편번호'] || ''}</td>
-            <td>${row['주소'] || ''}</td>
-            <td>${row['상세주소'] || ''}</td>
-            <td>${row['개인정보동의'] || ''}</td>
-            <td><button class="action-btn" type="button">수정</button></td>
-          `;
-          tr.querySelector('button').addEventListener('click', () => openEdit(row));
-          tbody.appendChild(tr);
-        }
-        setStatus(`총 ${data.count}건을 불러왔습니다.`);
-      } catch (e) {
+      } catch (err) {
         setStatus('데이터를 불러오는 중 오류가 발생했습니다.', true);
       }
     }
 
-    function openEdit(row) {
-      document.getElementById('editRowNumber').value = row._row_number;
-      document.getElementById('editZipcode').value = row['우편번호'] || '';
-      document.getElementById('editAddress').value = row['주소'] || '';
-      document.getElementById('editDetailAddress').value = row['상세주소'] || '';
-      dialogEl.showModal();
-    }
-
     async function saveEdit() {
+      if (!editingRow) return;
+
       const payload = {
-        row_number: Number(document.getElementById('editRowNumber').value),
-        zipcode: document.getElementById('editZipcode').value.trim(),
-        address: document.getElementById('editAddress').value.trim(),
-        detail_address: document.getElementById('editDetailAddress').value.trim()
+        row_number: editingRow.row_number,
+        zipcode: modalZipcode.value.trim(),
+        address: modalAddress.value.trim(),
+        detail_address: modalDetailAddress.value.trim(),
       };
-      setStatus('수정 중...');
+
+      if (!payload.zipcode || !payload.address) {
+        setModalStatus('우편번호와 주소를 입력해 주십시오.', true);
+        return;
+      }
+
+      setModalStatus('저장 중...');
+
       try {
-        const res = await fetch('/api/admin/update-row', {
+        const res = await fetch('/api/admin/update', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
         });
+
         const data = await res.json();
+
         if (!res.ok || !data.ok) {
-          setStatus(data.message || '수정에 실패했습니다.', true);
+          setModalStatus(data.message || '저장에 실패했습니다.', true);
           return;
         }
-        dialogEl.close();
-        setStatus(data.message);
-        loadRows();
-      } catch (e) {
-        setStatus('수정 중 오류가 발생했습니다.', true);
+
+        setModalStatus(data.message || '저장되었습니다.', false, true);
+        await loadRows();
+        setTimeout(closeModal, 500);
+      } catch (err) {
+        setModalStatus('저장 중 오류가 발생했습니다.', true);
       }
     }
 
-    document.getElementById('searchBtn').addEventListener('click', loadRows);
-    document.getElementById('reloadBtn').addEventListener('click', loadRows);
-    document.getElementById('logoutBtn').addEventListener('click', () => location.href='/admin/logout');
-    document.getElementById('closeDialogBtn').addEventListener('click', () => dialogEl.close());
-    document.getElementById('saveDialogBtn').addEventListener('click', saveEdit);
-    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadRows(); });
+    async function logout() {
+      try {
+        await fetch('/admin/logout', { method: 'POST' });
+      } finally {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    searchBtn.addEventListener('click', loadRows);
+    refreshBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      loadRows();
+    });
+    logoutBtn.addEventListener('click', logout);
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        loadRows();
+      }
+    });
+
+    modalCancelBtn.addEventListener('click', closeModal);
+    modalSaveBtn.addEventListener('click', saveEdit);
+
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !editModal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
 
     loadRows();
   </script>
