@@ -1,96 +1,77 @@
-# 문희공파백은공종중 종원 확인 앱 - Render 배포 안정화 버전
+# 백은공종중 종원 확인 + 주소 제출/수정 + 관리자 조회 (Apps Script 저장형)
 
-이 버전은 공개 링크 운영을 염두에 두고 Render 배포 성공률을 높이기 위해 아래 항목을 추가한 패키지입니다.
+이 버전은 **서비스 계정 JSON 키 없이** Google Apps Script 웹앱을 통해 Google Sheets에 주소를 저장합니다.
 
-- `Procfile` 추가
-- `runtime.txt` 추가
-- `render.yaml` 추가
-- `PORT` 환경변수 대응
-- `ADMIN_CONTACT` 환경변수 대응
-- `ProxyFix` 적용
-- `/healthz` 상태 확인 경로 추가
+## 포함 기능
+- 종원 여부 확인
+- 종원 확인 성공 시 주소 제출/수정
+- 주소 제출 전 개인정보 수집·이용 동의 체크박스
+- Google Sheets 저장 (Apps Script 웹앱 경유)
+- 관리자 전용 조회 페이지 (`/admin`)
+- 관리자 비밀번호 로그인
+- 관리자 주소 수정 기능
+- `35세세` 중복 표시 방지
+- 제목 `백은공종중 종원 확인`
 
-## 폴더 구조
-- `app.py`: Flask 서버 본체
-- `templates/index.html`: 조회 화면
-- `data/members.json`: 서버 내부 종원 데이터
-- `requirements.txt`: 의존성
-- `Procfile`: Render/기타 PaaS 시작 명령
-- `runtime.txt`: 파이썬 버전 고정
-- `render.yaml`: Render 블루프린트 설정
+## 1. GitHub 업로드
+압축을 푼 뒤 아래 파일/폴더를 기존 저장소에 덮어쓰기 업로드합니다.
 
-## 로컬 실행
-```bash
-pip install -r requirements.txt
-python app.py
-```
-브라우저에서 `http://127.0.0.1:5000` 접속
+- `app.py`
+- `requirements.txt`
+- `Procfile`
+- `runtime.txt`
+- `render.yaml`
+- `templates/`
+- `data/`
+- `apps_script/Code.gs`
 
-## GitHub 업로드 시 주의
-저장소 첫 화면에 아래가 바로 보여야 정상입니다.
+## 2. Render 환경변수
+아래 값을 Render > Environment에 추가합니다.
 
-```text
-app.py
-requirements.txt
-Procfile
-runtime.txt
-render.yaml
-data/
-templates/
-```
+### 필수
+- `ADMIN_CONTACT`
+- `APPS_SCRIPT_WEB_APP_URL`
+- `APPS_SCRIPT_SHARED_SECRET`
+- `ADMIN_PASSWORD`
+- `FLASK_SECRET_KEY`
 
-폴더가 한 겹 더 들어가면 Render에서 실행 실패할 수 있습니다.
+### 예시
+- `ADMIN_CONTACT=010-2923-2912 신무광`
+- `APPS_SCRIPT_WEB_APP_URL=https://script.google.com/macros/s/.../exec`
+- `APPS_SCRIPT_SHARED_SECRET=여기에_직접_정한_랜덤문자열`
+- `ADMIN_PASSWORD=여기에_직접_정한_비밀번호`
+- `FLASK_SECRET_KEY=여기에_직접_정한_긴_랜덤문자열`
 
-## Render 배포 방법 1: 일반 Web Service 방식
-1. GitHub에 이 폴더 내용 전체 업로드
-2. Render → `New +` → `Web Service`
-3. 저장소 연결
-4. 설정값 입력
-   - Runtime: Python
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-5. Environment Variables 추가
-   - `ADMIN_CONTACT=010-2923-2912 신무광`
-   - `REQUEST_WINDOW_SECONDS=300`
-   - `MAX_REQUESTS_PER_WINDOW=20`
-6. 배포 완료
+## 3. Google Apps Script 설정
+1. Google Sheets를 하나 새로 만듭니다.
+2. 메뉴에서 **확장 프로그램 > Apps Script**를 엽니다.
+3. `apps_script/Code.gs` 파일 내용을 그대로 붙여넣습니다.
+4. 코드 상단의 `SECRET_TOKEN` 값을 Render의 `APPS_SCRIPT_SHARED_SECRET`와 **같은 값**으로 바꿉니다.
+5. 저장합니다.
+6. 오른쪽 위 **배포 > 새 배포**를 클릭합니다.
+7. 유형에서 **웹 앱**을 선택합니다.
+8. 실행 사용자: **나**
+9. 액세스 권한: **모든 사용자**
+10. 배포 후 발급된 URL을 `APPS_SCRIPT_WEB_APP_URL` 환경변수에 넣습니다.
 
-## Render 배포 방법 2: render.yaml 사용
-1. GitHub에 업로드
-2. Render → `New +` → `Blueprint`
-3. 저장소 선택
-4. `render.yaml` 내용을 읽어 자동 설정
-5. 배포
+## 4. Google Sheets 시트 이름
+Apps Script 코드 기본값은 `주소제출`입니다. 같은 이름의 탭이 없으면 자동으로 생성합니다.
 
-## 헬스체크
-배포 후 아래 주소로 확인 가능합니다.
+## 5. 관리자 페이지
+- 종원 확인 페이지: `/`
+- 관리자 로그인: `/admin/login`
+- 관리자 화면: `/admin`
 
-```text
-https://생성된주소.onrender.com/healthz
-```
+예시:
+- `https://배포주소.onrender.com/admin`
 
-정상 응답 예시:
-```json
-{"ok": true, "member_count": 739}
-```
+## 6. 주소 수정 방식
+같은 종원이 다시 주소를 제출하면 Google Sheets에 새 행을 계속 쌓지 않고 기존 행을 찾아 최신 정보로 갱신합니다.
 
-## 조회 규칙
-- 성명 + 전화번호가 함께 일치해야 종원으로 판정합니다.
-- 성명은 다음과 같이 입력해도 조회됩니다.
-  - 전체 이름: `신갑례(현숙)`
-  - 성 제외: `갑례`
-  - 괄호 안 이름: `현숙`
-- 연락처는 숫자만 입력하거나 하이픈 포함 입력 모두 허용합니다.
-
-## 환경변수
-- `ADMIN_CONTACT`: 미등록 안내 문구에 표시할 연락처
-- `REQUEST_WINDOW_SECONDS`: 요청 횟수 제한 시간창(초)
-- `MAX_REQUESTS_PER_WINDOW`: 시간창 내 최대 요청 수
-- `PORT`: Render가 자동 주입하므로 직접 수정 불필요
-
-## 추천 운영 보강
-1. Cloudflare Turnstile 또는 Google reCAPTCHA 추가
-2. 맞춤 도메인 연결
-3. 관리자 연락처를 코드가 아닌 Render 환경변수에서만 관리
-4. 서버 로그 최소화
-5. 정기적으로 명부 갱신
+## 7. 배포 후 기본 테스트
+1. `/healthz` 접속
+2. 종원 조회 테스트
+3. 주소 제출 테스트
+4. Google Sheets에 행이 저장되는지 확인
+5. `/admin/login` 접속
+6. 관리자 수정 테스트

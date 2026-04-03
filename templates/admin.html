@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <style>
+    body{margin:0;padding:24px;background:#eef2f7;color:#162033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;}
+    .wrap{max-width:1400px;margin:0 auto;}
+    .top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+    h1{margin:0;font-size:34px;}
+    .sub{margin:6px 0 0;color:#6b7890;}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;}
+    input[type="search"], input[type="text"]{padding:12px 14px;border:1px solid #cfd8e6;border-radius:12px;font-size:15px;}
+    button{padding:12px 16px;border:none;border-radius:12px;background:#2d559a;color:#fff;font-weight:700;cursor:pointer;}
+    button.secondary{background:#475467;}
+    .panel{background:#fff;border:1px solid #dbe4f0;border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(18,28,45,.05);}
+    .notice{margin-bottom:14px;color:#6b7890;font-size:14px;}
+    table{width:100%;border-collapse:collapse;font-size:14px;}
+    th,td{padding:12px 10px;border-bottom:1px solid #e8eef7;text-align:left;vertical-align:top;}
+    th{background:#f8fafc;position:sticky;top:0;}
+    .table-wrap{overflow:auto;max-height:70vh;border-radius:14px;border:1px solid #e8eef7;}
+    .action-btn{padding:8px 10px;font-size:13px;border-radius:10px;}
+    .status{margin:12px 0 0;font-size:14px;color:#0f766e;}
+    .error{color:#b42318;}
+    dialog{border:none;border-radius:18px;padding:0;max-width:640px;width:95%;}
+    dialog::backdrop{background:rgba(0,0,0,.35);}
+    .modal{padding:24px;}
+    .modal h2{margin:0 0 12px;}
+    .field{margin:12px 0;}
+    .field label{display:block;font-weight:700;margin-bottom:8px;}
+    .field input{width:100%;}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+    @media (max-width: 768px){body{padding:12px;} h1{font-size:28px;}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>{{ title }}</h1>
+        <p class="sub">Apps Script를 통해 저장된 종원 주소를 검색하고 수정할 수 있습니다.</p>
+      </div>
+      <div class="tools">
+        <input id="searchInput" type="search" placeholder="이름, 연락처, 주소 검색">
+        <button id="searchBtn" type="button">검색</button>
+        <button id="reloadBtn" type="button" class="secondary">새로고침</button>
+        <button id="logoutBtn" type="button" class="secondary">로그아웃</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="notice">같은 종원이 다시 제출하면 기존 행이 갱신됩니다. 수정 버튼을 누르면 관리자도 직접 주소를 바꿀 수 있습니다.</div>
+      <div class="table-wrap">
+        <table id="rowsTable">
+          <thead>
+            <tr>
+              <th>행</th>
+              <th>수정시각</th>
+              <th>입력성명</th>
+              <th>연락처</th>
+              <th>명부성명</th>
+              <th>세대</th>
+              <th>우편번호</th>
+              <th>주소</th>
+              <th>상세주소</th>
+              <th>동의</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <dialog id="editDialog">
+    <div class="modal">
+      <h2>주소 수정</h2>
+      <div class="field">
+        <label>행 번호</label>
+        <input id="editRowNumber" type="text" readonly>
+      </div>
+      <div class="field">
+        <label>우편번호</label>
+        <input id="editZipcode" type="text">
+      </div>
+      <div class="field">
+        <label>주소</label>
+        <input id="editAddress" type="text">
+      </div>
+      <div class="field">
+        <label>상세주소</label>
+        <input id="editDetailAddress" type="text">
+      </div>
+      <div class="modal-actions">
+        <button id="closeDialogBtn" type="button" class="secondary">취소</button>
+        <button id="saveDialogBtn" type="button">저장</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const tbody = document.querySelector('#rowsTable tbody');
+    const statusEl = document.getElementById('status');
+    const dialogEl = document.getElementById('editDialog');
+    const searchInput = document.getElementById('searchInput');
+
+    function setStatus(message, isError=false) {
+      statusEl.textContent = message || '';
+      statusEl.className = 'status' + (isError ? ' error' : '');
+    }
+
+    async function loadRows() {
+      const q = searchInput.value.trim();
+      setStatus('불러오는 중...');
+      tbody.innerHTML = '';
+      try {
+        const res = await fetch('/api/admin/rows?' + new URLSearchParams({q}));
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          setStatus(data.message || '데이터를 불러오지 못했습니다.', true);
+          return;
+        }
+        if (!data.rows.length) {
+          setStatus('표시할 주소 정보가 없습니다.');
+          return;
+        }
+        for (const row of data.rows) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row._row_number}</td>
+            <td>${row['수정시각'] || row['제출시각'] || ''}</td>
+            <td>${row['입력성명'] || ''}</td>
+            <td>${row['입력연락처'] || ''}</td>
+            <td>${row['명부성명'] || ''}</td>
+            <td>${row['세대'] || ''}</td>
+            <td>${row['우편번호'] || ''}</td>
+            <td>${row['주소'] || ''}</td>
+            <td>${row['상세주소'] || ''}</td>
+            <td>${row['개인정보동의'] || ''}</td>
+            <td><button class="action-btn" type="button">수정</button></td>
+          `;
+          tr.querySelector('button').addEventListener('click', () => openEdit(row));
+          tbody.appendChild(tr);
+        }
+        setStatus(`총 ${data.count}건을 불러왔습니다.`);
+      } catch (e) {
+        setStatus('데이터를 불러오는 중 오류가 발생했습니다.', true);
+      }
+    }
+
+    function openEdit(row) {
+      document.getElementById('editRowNumber').value = row._row_number;
+      document.getElementById('editZipcode').value = row['우편번호'] || '';
+      document.getElementById('editAddress').value = row['주소'] || '';
+      document.getElementById('editDetailAddress').value = row['상세주소'] || '';
+      dialogEl.showModal();
+    }
+
+    async function saveEdit() {
+      const payload = {
+        row_number: Number(document.getElementById('editRowNumber').value),
+        zipcode: document.getElementById('editZipcode').value.trim(),
+        address: document.getElementById('editAddress').value.trim(),
+        detail_address: document.getElementById('editDetailAddress').value.trim()
+      };
+      setStatus('수정 중...');
+      try {
+        const res = await fetch('/api/admin/update-row', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          setStatus(data.message || '수정에 실패했습니다.', true);
+          return;
+        }
+        dialogEl.close();
+        setStatus(data.message);
+        loadRows();
+      } catch (e) {
+        setStatus('수정 중 오류가 발생했습니다.', true);
+      }
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', loadRows);
+    document.getElementById('reloadBtn').addEventListener('click', loadRows);
+    document.getElementById('logoutBtn').addEventListener('click', () => location.href='/admin/logout');
+    document.getElementById('closeDialogBtn').addEventListener('click', () => dialogEl.close());
+    document.getElementById('saveDialogBtn').addEventListener('click', saveEdit);
+    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadRows(); });
+
+    loadRows();
+  </script>
+</body>
+</html>

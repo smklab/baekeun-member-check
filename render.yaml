@@ -2,16 +2,21 @@ services:
   - type: web
     name: baekeun-member-check
     runtime: python
-    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
-    autoDeploy: true
+    plan: free
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.11
       - key: ADMIN_CONTACT
-        value: 010-2923-2912 신무광
-      - key: REQUEST_WINDOW_SECONDS
-        value: 300
-      - key: MAX_REQUESTS_PER_WINDOW
-        value: 20
+        sync: false
+      - key: APPS_SCRIPT_WEB_APP_URL
+        sync: false
+      - key: APPS_SCRIPT_SHARED_SECRET
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: APP_TITLE
+        value: 백은공종중 종원 확인
+      - key: ADMIN_TITLE
+        value: 백은공종중 주소 관리

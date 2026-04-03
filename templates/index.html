@@ -1,190 +1,206 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>문희공파백은공종중 종원 확인</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --border: #dde3ee;
-      --text: #1d2433;
-      --muted: #667085;
-      --accent: #234a8b;
-      --ok-bg: #edf7ed;
-      --ok-text: #176438;
-      --err-bg: #fff3f0;
-      --err-text: #a53b2d;
+      --bg: #eef2f7;
+      --panel: #ffffff;
+      --text: #162033;
+      --muted: #6b7890;
+      --border: #dbe4f0;
+      --primary: #2d559a;
+      --primary-dark: #22457d;
+      --success-bg: #eaf6ec;
+      --success-text: #166534;
+      --error-bg: #fff1f2;
+      --error-text: #b42318;
+      --notice-bg: #f8fafc;
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-      background: linear-gradient(180deg, #f7f9fc 0%, #eef2f7 100%);
-      color: var(--text);
-    }
-    .wrap {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-      padding: 28px 22px;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 1.4rem;
-      line-height: 1.35;
-      text-align: center;
-    }
-    p.desc {
-      margin: 0 0 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-    .field { margin-bottom: 16px; }
-    input {
-      width: 100%;
-      padding: 14px 15px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      font-size: 1rem;
-      outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease;
-      background: #fff;
-    }
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(35, 74, 139, 0.12);
-    }
-    .hint {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.45;
-    }
-    button {
-      width: 100%;
-      border: 0;
-      border-radius: 14px;
-      padding: 15px;
-      font-size: 1rem;
-      font-weight: 700;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-    }
-    button:disabled {
-      opacity: 0.7;
-      cursor: wait;
-    }
-    .result {
-      display: none;
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 16px;
-      font-size: 0.98rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-    .result.ok {
-      display: block;
-      background: var(--ok-bg);
-      color: var(--ok-text);
-    }
-    .result.err {
-      display: block;
-      background: var(--err-bg);
-      color: var(--err-text);
-    }
-    .footnote {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.55;
-      text-align: center;
+    body { margin:0; padding:24px; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif; line-height:1.55; }
+    .wrap { max-width:860px; margin:0 auto; background:var(--panel); border:1px solid var(--border); border-radius:28px; padding:36px 34px 32px; box-shadow:0 8px 24px rgba(18,28,45,.05); }
+    h1 { margin:0 0 10px; text-align:center; font-size:clamp(28px,4vw,48px); line-height:1.2; }
+    .sub { text-align:center; color:var(--muted); font-size:clamp(16px,2.3vw,22px); margin:0 0 34px; }
+    label { display:block; font-size:20px; font-weight:700; margin:22px 0 10px; }
+    input { width:100%; border:1px solid #cfd8e6; border-radius:18px; padding:20px 22px; font-size:18px; outline:none; transition:border-color .15s ease, box-shadow .15s ease; background:#fff; }
+    input:focus { border-color:var(--primary); box-shadow:0 0 0 4px rgba(45,85,154,.10); }
+    .hint { margin:10px 4px 0; color:var(--muted); font-size:15px; }
+    .btn { width:100%; border:none; border-radius:20px; padding:21px 24px; margin-top:22px; background:var(--primary); color:#fff; font-size:22px; font-weight:800; cursor:pointer; }
+    .btn:hover { background:var(--primary-dark); }
+    .btn.secondary { background:#0f766e; margin-top:18px; }
+    .btn.secondary:hover { background:#115e59; }
+    .result, .address-panel { margin-top:24px; border-radius:22px; padding:24px; font-size:18px; }
+    .result.success { background:var(--success-bg); color:var(--success-text); }
+    .result.error { background:var(--error-bg); color:var(--error-text); }
+    .result.warning { background:#fff7ed; color:#9a3412; }
+    .address-panel { background:var(--notice-bg); border:1px solid var(--border); display:none; }
+    .address-panel.visible { display:block; }
+    .address-title { font-size:22px; font-weight:800; margin:0 0 8px; }
+    .address-sub { margin:0 0 18px; color:var(--muted); }
+    .consent-box { display:flex; gap:10px; align-items:flex-start; margin-top:18px; padding:14px 16px; border:1px solid var(--border); border-radius:16px; background:#fff; }
+    .consent-box input[type="checkbox"] { width:20px; height:20px; margin-top:2px; padding:0; }
+    .consent-text { font-size:15px; color:var(--text); }
+    .small-note { margin-top:12px; color:var(--muted); font-size:14px; }
+    .footer-note { text-align:center; color:var(--muted); margin-top:28px; font-size:16px; }
+    .admin-link { margin-top:14px; text-align:right; font-size:14px; }
+    .admin-link a { color:var(--muted); text-decoration:none; }
+    @media (max-width: 640px) {
+      body { padding:10px; }
+      .wrap { padding:24px 16px 22px; border-radius:20px; }
+      label { font-size:18px; }
+      input { padding:16px 16px; font-size:17px; }
+      .btn { font-size:20px; padding:18px 16px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <main class="card">
-      <h1>문희공파백은공종중 종원 확인</h1>
-      <p class="desc">성명과 연락처를 입력하시면 종원 등록 여부를 확인하실 수 있습니다.</p>
+    <h1>{{ title }}</h1>
+    <p class="sub">성명과 연락처를 입력하시면 종원 등록 여부를 확인하실 수 있습니다.</p>
 
-      <form id="member-form">
-        <div class="field">
-          <label for="name">성명</label>
-          <input id="name" name="name" type="text" placeholder="예: 신갑례 / 갑례 / 현숙" autocomplete="name" required />
-          <div class="hint">전체 이름, 성을 제외한 이름, 괄호 안 이름으로도 조회할 수 있습니다.</div>
+    <label for="name">성명</label>
+    <input id="name" name="name" type="text" placeholder="예: 신무광">
+    <p class="hint">전체 이름, 성을 제외한 이름, 괄호 안 이름으로도 조회할 수 있습니다.</p>
+
+    <label for="phone">연락처</label>
+    <input id="phone" name="phone" type="text" inputmode="numeric" placeholder="예: 010-1234-5678">
+    <p class="hint">숫자만 입력하거나 하이픈을 포함해 입력하셔도 됩니다.</p>
+
+    <button id="checkBtn" class="btn" type="button">종원 여부 확인</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+    <div id="warningBox" class="result warning" style="display:none;"></div>
+
+    <section id="addressPanel" class="address-panel">
+      <h2 class="address-title">우편물 수령 주소 제출 / 수정</h2>
+      <p class="address-sub">종원으로 확인되신 분만 우편번호와 주소를 제출하거나 수정하실 수 있습니다.</p>
+
+      <label for="zipcode">우편번호</label>
+      <input id="zipcode" type="text" placeholder="예: 12345">
+
+      <label for="address">주소</label>
+      <input id="address" type="text" placeholder="예: 서울특별시 ...">
+
+      <label for="detailAddress">상세주소</label>
+      <input id="detailAddress" type="text" placeholder="예: 101동 202호">
+
+      <div class="consent-box">
+        <input id="consent" type="checkbox">
+        <div class="consent-text">
+          본인은 우편물 발송 및 종중 운영 관련 연락을 위해 우편번호와 주소를 수집·이용하는 것에 동의합니다.
         </div>
+      </div>
 
-        <div class="field">
-          <label for="phone">연락처</label>
-          <input id="phone" name="phone" type="tel" placeholder="예: 010-1234-5678" inputmode="numeric" autocomplete="tel" required />
-          <div class="hint">숫자만 입력하거나 하이픈을 포함해 입력하셔도 됩니다.</div>
-        </div>
+      <p class="small-note">입력하신 주소 정보는 종중 우편물 발송과 관련된 업무에만 사용됩니다.</p>
+      <button id="saveAddressBtn" class="btn secondary" type="button">주소 제출 / 수정</button>
+    </section>
 
-        <button id="submit-btn" type="submit">종원 여부 확인</button>
-      </form>
-
-      <div id="result" class="result" aria-live="polite"></div>
-
-      <div class="footnote">입력하신 정보는 조회용으로만 사용됩니다.</div>
-    </main>
+    <div class="footer-note">입력하신 정보는 조회 및 주소 제출 용도로만 사용됩니다.</div>
+    <div class="admin-link"><a href="/admin/login">관리자 로그인</a></div>
   </div>
 
   <script>
-    const form = document.getElementById('member-form');
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const checkBtn = document.getElementById('checkBtn');
     const resultBox = document.getElementById('result');
-    const submitButton = document.getElementById('submit-btn');
+    const warningBox = document.getElementById('warningBox');
+    const addressPanel = document.getElementById('addressPanel');
+    const zipcodeInput = document.getElementById('zipcode');
+    const addressInput = document.getElementById('address');
+    const detailAddressInput = document.getElementById('detailAddress');
+    const consentInput = document.getElementById('consent');
+    const saveAddressBtn = document.getElementById('saveAddressBtn');
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
+    let verifiedMember = null;
 
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
+    function showResult(type, message) {
+      resultBox.style.display = 'block';
+      resultBox.className = `result ${type}`;
+      resultBox.textContent = message;
+    }
 
-      resultBox.className = 'result';
-      resultBox.style.display = 'none';
-      submitButton.disabled = true;
-      submitButton.textContent = '확인 중...';
+    function hideAddressPanel() {
+      addressPanel.classList.remove('visible');
+      verifiedMember = null;
+      zipcodeInput.value = '';
+      addressInput.value = '';
+      detailAddressInput.value = '';
+      consentInput.checked = false;
+    }
+
+    checkBtn.addEventListener('click', async () => {
+      warningBox.style.display = 'none';
+      hideAddressPanel();
+      showResult('success', '조회 중입니다...');
+      try {
+        const res = await fetch('/api/check-member', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ name: nameInput.value, phone: phoneInput.value })
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          showResult('error', data.message || '조회 중 오류가 발생했습니다.');
+          return;
+        }
+        showResult('success', data.message || '종원으로 확인되었습니다.');
+        verifiedMember = data.member;
+        zipcodeInput.value = verifiedMember.zipcode || '';
+        addressInput.value = verifiedMember.address || '';
+        detailAddressInput.value = verifiedMember.detail_address || '';
+        addressPanel.classList.add('visible');
+
+        if (data.warning) {
+          warningBox.style.display = 'block';
+          warningBox.textContent = `안내: 주소 저장소 연결 중 경고가 있습니다. ${data.warning}`;
+        }
+      } catch (err) {
+        showResult('error', '조회 중 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.');
+      }
+    });
+
+    saveAddressBtn.addEventListener('click', async () => {
+      if (!verifiedMember) {
+        showResult('error', '먼저 종원 여부를 확인해 주십시오.');
+        return;
+      }
+      if (!consentInput.checked) {
+        showResult('error', '개인정보 수집·이용 동의에 체크해 주십시오.');
+        return;
+      }
+
+      saveAddressBtn.disabled = true;
+      const originalText = saveAddressBtn.textContent;
+      saveAddressBtn.textContent = '저장 중입니다...';
 
       try {
-        const response = await fetch('/api/check-member', {
+        const res = await fetch('/api/address/upsert', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, phone })
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            input_name: verifiedMember.input_name,
+            input_phone: verifiedMember.input_phone,
+            zipcode: zipcodeInput.value,
+            address: addressInput.value,
+            detail_address: detailAddressInput.value,
+            consent: consentInput.checked
+          })
         });
-
-        const data = await response.json();
-        resultBox.textContent = data.message || '처리 중 오류가 발생했습니다.';
-        resultBox.classList.add(data.matched ? 'ok' : 'err');
-        resultBox.style.display = 'block';
-      } catch (error) {
-        resultBox.textContent = '서버 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.';
-        resultBox.classList.add('err');
-        resultBox.style.display = 'block';
+        const data = await res.json();
+        if (!data.ok) {
+          showResult('error', data.message || '주소 저장에 실패했습니다.');
+          return;
+        }
+        showResult('success', data.message || '주소 정보가 저장되었습니다.');
+      } catch (err) {
+        showResult('error', '주소 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.');
       } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = '종원 여부 확인';
+        saveAddressBtn.disabled = false;
+        saveAddressBtn.textContent = originalText;
       }
     });
   </script>
