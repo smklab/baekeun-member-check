@@ -40,24 +40,38 @@ MEMBERS = load_members()
 
 
 def normalize_phone(value: str) -> str:
-    digits = re.sub(r"\D+", "", (value or "").strip())
-    if not digits:
-        return ""
-    if digits.endswith(".0"):
-        digits = digits[:-2]
+    raw = str(value or "").strip()
+    if raw.endswith(".0"):
+        raw = raw[:-2]
+    digits = re.sub(r"\D+", "", raw)
     return digits
+
+
+def repair_phone_candidates(digits: str) -> set[str]:
+    candidates = {digits}
+    if not digits:
+        return set()
+
+    # 일부 데이터에서 맨 앞의 0이 맨 뒤로 밀린 형태(예: 10292329120 -> 01029232912)를 보정
+    if len(digits) == 11 and not digits.startswith("0") and digits.endswith("0"):
+        candidates.add("0" + digits[:-1])
+
+    # 앞자리 0 누락 보정
+    if len(digits) == 10 and not digits.startswith("0"):
+        candidates.add("0" + digits)
+
+    return {c for c in candidates if c}
 
 
 def phone_variants(value: str) -> set[str]:
     digits = normalize_phone(value)
     variants = set()
-    if not digits:
-        return variants
-    variants.add(digits)
-    if digits.startswith("0"):
-        variants.add(digits[1:])
-    else:
-        variants.add("0" + digits)
+    for candidate in repair_phone_candidates(digits):
+        variants.add(candidate)
+        if candidate.startswith("0"):
+            variants.add(candidate[1:])
+        else:
+            variants.add("0" + candidate)
     return {v for v in variants if v}
 
 
